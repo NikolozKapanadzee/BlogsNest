@@ -13,12 +13,16 @@ import { isValidObjectId, Model } from 'mongoose';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   async create(createUserDto: CreateUserDto) {
-    const { email, password } = createUserDto;
+    const { email, password, username } = createUserDto;
     const existUser = await this.userModel.findOne({ email });
     if (existUser) {
       throw new BadRequestException('Email already exists');
     }
-    const createdUser = await this.userModel.create({ email, password });
+    const createdUser = await this.userModel.create({
+      email,
+      password,
+      username,
+    });
     return {
       message: 'User Created Successfully',
       user: createdUser,
