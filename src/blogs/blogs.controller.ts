@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from './blogs.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
@@ -14,6 +15,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Blog } from './schema/blog.schema';
 import { Model } from 'mongoose';
 import { User } from 'src/users/schema/user.schema';
+import { IsAuthGuard } from 'src/guards/IsAuthGuard.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -23,6 +25,7 @@ export class BlogsController {
     @InjectModel(User.name) private userModel: Model<User>,
   ) {}
 
+  @UseGuards(IsAuthGuard)
   @Post()
   create(@Body() createBlogDto: CreateBlogDto) {
     return this.blogsService.create(createBlogDto);
@@ -38,11 +41,13 @@ export class BlogsController {
     return this.blogsService.findOne(id);
   }
 
+  @UseGuards(IsAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
     return this.blogsService.update(id, updateBlogDto);
   }
 
+  @UseGuards(IsAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.blogsService.remove(id);
