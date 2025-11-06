@@ -1,3 +1,4 @@
+import { UserId } from 'src/decorators/user.decorator';
 import {
   BadRequestException,
   Injectable,
@@ -8,13 +9,24 @@ import { UpdateBlogDto } from './dto/update-blog.dto';
 import { Blog } from './schema/blog.schema';
 import { isValidObjectId, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/users/schema/user.schema';
 
 @Injectable()
 export class BlogsService {
-  constructor(@InjectModel(Blog.name) private blogModel: Model<Blog>) {}
-  async create(createBlogDto: CreateBlogDto) {
+  constructor(
+    @InjectModel(Blog.name) private blogModel: Model<Blog>,
+    @InjectModel(User.name) private userModel: Model<User>,
+  ) {}
+  async create(createBlogDto: CreateBlogDto, userId: string) {
     const { title, content } = createBlogDto;
-    const newBlog = await this.blogModel.create(createBlogDto);
+    const newBlog = await this.blogModel.create({
+      title,
+      content,
+      author: userId,
+    });
+    await this.userModel.findByIdAndUpdate(userId, {
+      $push: { blogs: newBlog._id },
+    });
     return {
       message: 'Blog Created Successfully',
       blog: newBlog,

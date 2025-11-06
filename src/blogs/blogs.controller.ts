@@ -16,6 +16,7 @@ import { Blog } from './schema/blog.schema';
 import { Model } from 'mongoose';
 import { User } from 'src/users/schema/user.schema';
 import { IsAuthGuard } from 'src/guards/IsAuthGuard.guard';
+import { UserId } from 'src/decorators/user.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -27,8 +28,8 @@ export class BlogsController {
 
   @UseGuards(IsAuthGuard)
   @Post()
-  create(@Body() createBlogDto: CreateBlogDto) {
-    return this.blogsService.create(createBlogDto);
+  create(@Body() createBlogDto: CreateBlogDto, @UserId() userId) {
+    return this.blogsService.create(createBlogDto, userId);
   }
 
   @Get()
