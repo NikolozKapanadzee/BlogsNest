@@ -1,6 +1,7 @@
 import { UserId } from 'src/decorators/user.decorator';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -48,9 +49,18 @@ export class BlogsService {
     return blog;
   }
 
-  async update(id: string, updateBlogDto: UpdateBlogDto) {
+  async update(id: string, updateBlogDto: UpdateBlogDto, userId: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
+    }
+    const blog = await this.blogModel.findById(id);
+    if (!blog) {
+      throw new NotFoundException('Blog not found');
+    }
+    if (blog.author.toString() !== userId.toString()) {
+      throw new ForbiddenException(
+        'You have not permition to update that blog',
+      );
     }
     const updatedBlog = await this.blogModel.findByIdAndUpdate(
       id,
@@ -60,9 +70,6 @@ export class BlogsService {
         runValidators: true,
       },
     );
-    if (!updatedBlog) {
-      throw new NotFoundException('Blog Not Found');
-    }
     return {
       message: 'Blog has been updated',
       blog: updatedBlog,
@@ -73,15 +80,21 @@ export class BlogsService {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
     }
+    const blog = await this.blogModel.findById(id);
+    if (!blog) {
+      throw new NotFoundException('Blog Not Found');
+    }
+    if (blog.author.toString() !== userId.toString()) {
+      throw new ForbiddenException(
+        'You have not permition to delete that blog',
+      );
+    }
     const deletedBlog = await this.blogModel.findByIdAndDelete(id);
     await this.userModel.findByIdAndUpdate(
       deletedBlog?.author,
       { $pull: { blogs: deletedBlog?._id } },
       { new: true },
     );
-    if (!deletedBlog) {
-      throw new NotFoundException('Blog Not Found');
-    }
     return {
       message: 'Blog has been deleted',
       blog: deletedBlog,

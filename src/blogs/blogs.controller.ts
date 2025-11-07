@@ -44,8 +44,12 @@ export class BlogsController {
 
   @UseGuards(IsAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    return this.blogsService.update(id, updateBlogDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateBlogDto: UpdateBlogDto,
+    @UserId() userId: string,
+  ) {
+    return this.blogsService.update(id, updateBlogDto, userId);
   }
 
   @UseGuards(IsAuthGuard)
