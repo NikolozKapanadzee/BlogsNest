@@ -7,7 +7,10 @@ import { Blog, BlogSchema } from 'src/blogs/schema/blog.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ schema: UserSchema, name: User.name }]),
+    MongooseModule.forFeature([
+      { schema: UserSchema, name: User.name },
+      { schema: BlogSchema, name: Blog.name },
+    ]),
   ],
   controllers: [UsersController],
   providers: [UsersService],

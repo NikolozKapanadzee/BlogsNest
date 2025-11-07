@@ -8,10 +8,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { isValidObjectId, Model } from 'mongoose';
+import { Blog } from 'src/blogs/schema/blog.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Blog.name) private blogModel: Model<Blog>,
+  ) {}
 
   async findAll() {
     return this.userModel.find();
@@ -54,6 +58,9 @@ export class UsersService {
       throw new BadRequestException('Invalid ID format');
     }
     const deletedUser = await this.userModel.findByIdAndDelete(id);
+
+    await this.blogModel.deleteMany({ author: id });
+
     if (!deletedUser) {
       throw new NotFoundException('User Not Found');
     }
