@@ -50,7 +50,7 @@ export class BlogsController {
 
   @UseGuards(IsAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.blogsService.remove(id);
+  remove(@Param('id') id: string, @UserId() userId: string) {
+    return this.blogsService.remove(id, userId);
   }
 }

@@ -69,11 +69,16 @@ export class BlogsService {
     };
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
     }
     const deletedBlog = await this.blogModel.findByIdAndDelete(id);
+    await this.userModel.findByIdAndUpdate(
+      deletedBlog?.author,
+      { $pull: { blogs: deletedBlog?._id } },
+      { new: true },
+    );
     if (!deletedBlog) {
       throw new NotFoundException('Blog Not Found');
     }
