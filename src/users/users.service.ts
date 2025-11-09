@@ -9,12 +9,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { isValidObjectId, Model } from 'mongoose';
 import { Blog } from 'src/blogs/schema/blog.schema';
+import { Comment } from 'src/comments/schema/comments.schema';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
   ) {}
 
   async findAll() {
@@ -60,6 +62,7 @@ export class UsersService {
     const deletedUser = await this.userModel.findByIdAndDelete(id);
 
     await this.blogModel.deleteMany({ author: id });
+    await this.commentModel.deleteMany({ author: id });
 
     if (!deletedUser) {
       throw new NotFoundException('User Not Found');

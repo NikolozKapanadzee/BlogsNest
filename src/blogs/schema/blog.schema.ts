@@ -15,13 +15,13 @@ export class Blog {
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
+    ref: 'User',
   })
   author: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     type: [mongoose.Types.ObjectId],
-    ref: 'comment',
+    ref: 'Comment',
     default: [],
   })
   comments: mongoose.Types.ObjectId[];

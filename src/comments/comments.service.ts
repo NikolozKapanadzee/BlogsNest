@@ -25,14 +25,11 @@ export class CommentsService {
       author: userId,
       blogId: blogId,
     });
-    console.log(userId, 'userId');
-    console.log(blogId, 'blogId');
-
     await this.blogModel.findByIdAndUpdate(blogId, {
-      $push: { comments: newComment._id },
+      $push: { comment: newComment._id },
     });
     await this.userModel.findByIdAndUpdate(userId, {
-      $push: { comments: newComment._id },
+      $push: { comment: newComment._id },
     });
     return {
       message: 'comment created successfully',

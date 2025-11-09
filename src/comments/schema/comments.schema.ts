@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import { Blog } from 'src/blogs/schema/blog.schema';
+import { User } from 'src/users/schema/user.schema';
 
 @Schema({ timestamps: true })
 export class Comment {
@@ -10,13 +12,13 @@ export class Comment {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'blog',
+    ref: 'Blog',
   })
   blogId: string;
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'user',
+    ref: 'User',
   })
   author: string;
 }

@@ -11,12 +11,14 @@ import { Blog } from './schema/blog.schema';
 import { isValidObjectId, Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/users/schema/user.schema';
+import { Comment } from 'src/comments/schema/comments.schema';
 
 @Injectable()
 export class BlogsService {
   constructor(
     @InjectModel(Blog.name) private blogModel: Model<Blog>,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
   ) {}
   async create(createBlogDto: CreateBlogDto, userId: string) {
     const { title, content } = createBlogDto;
@@ -95,6 +97,8 @@ export class BlogsService {
       { $pull: { blogs: deletedBlog?._id } },
       { new: true },
     );
+    await this.commentModel.deleteMany({ author: id });
+
     return {
       message: 'Blog has been deleted',
       blog: deletedBlog,
