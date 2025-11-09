@@ -1,4 +1,3 @@
-import { UserId } from 'src/decorators/user.decorator';
 import {
   BadRequestException,
   ForbiddenException,

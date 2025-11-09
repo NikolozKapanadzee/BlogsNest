@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -30,10 +31,10 @@ export class CommentsService {
       blogId: blogId,
     });
     await this.blogModel.findByIdAndUpdate(blogId, {
-      $push: { comment: newComment._id },
+      $push: { comments: newComment._id },
     });
     await this.userModel.findByIdAndUpdate(userId, {
-      $push: { comment: newComment._id },
+      $push: { comments: newComment._id },
     });
     return {
       message: 'comment created successfully',
@@ -56,13 +57,18 @@ export class CommentsService {
     return comment;
   }
 
-  async update(id: string, updateCommentDto: UpdateCommentDto) {
+  async update(id: string, updateCommentDto: UpdateCommentDto, userId) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
     }
     const comment = await this.commentModel.findById(id);
     if (!comment) {
       throw new NotFoundException('comment not found');
+    }
+    if (comment.author.toString() !== userId.toString()) {
+      throw new ForbiddenException(
+        'you do not have permition do update that comment',
+      );
     }
     const updatedComment = await this.commentModel.findByIdAndUpdate(
       id,
@@ -78,13 +84,18 @@ export class CommentsService {
     };
   }
 
-  async remove(id: string) {
+  async remove(id: string, userId) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException('Invalid ID format');
     }
     const comment = await this.commentModel.findById(id);
     if (!comment) {
       throw new NotFoundException('comment not found');
+    }
+    if (comment.author.toString() !== userId.toString()) {
+      throw new ForbiddenException(
+        'you do not have permition do update that comment',
+      );
     }
     const deletedComment = await this.commentModel.findByIdAndDelete(id);
     if (!deletedComment) {
@@ -93,14 +104,14 @@ export class CommentsService {
     await this.blogModel.findByIdAndUpdate(
       deletedComment?.author,
       {
-        $pull: { comment: deletedComment._id },
+        $pull: { comments: deletedComment._id },
       },
       { new: true },
     );
     await this.userModel.findByIdAndUpdate(
       deletedComment?.author,
       {
-        $pull: { comment: deletedComment._id },
+        $pull: { comments: deletedComment._id },
       },
       { new: true },
     );

@@ -39,17 +39,24 @@ export class CommentsController {
   }
 
   @Get(':id')
+  @UseGuards(IsAuthGuard)
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentsService.update(id, updateCommentDto);
+  @UseGuards(IsAuthGuard)
+  update(
+    @Param('id') id: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+    @UserId() userId: string,
+  ) {
+    return this.commentsService.update(id, updateCommentDto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentsService.remove(id);
+  @UseGuards(IsAuthGuard)
+  remove(@Param('id') id: string, @UserId() userId: string) {
+    return this.commentsService.remove(id, userId);
   }
 }

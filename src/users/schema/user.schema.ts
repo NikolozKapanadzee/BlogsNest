@@ -38,7 +38,7 @@ export class User {
     ref: 'Comment',
     default: [],
   })
-  comment: mongoose.Types.ObjectId[];
+  comments: mongoose.Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
