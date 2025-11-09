@@ -1,9 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Comment } from './schema/comments.schema';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { User } from 'src/users/schema/user.schema';
 import { Blog } from 'src/blogs/schema/blog.schema';
 
@@ -37,19 +41,72 @@ export class CommentsService {
     };
   }
 
-  findAll() {
-    return `This action returns all comments`;
+  async findAll() {
+    return this.commentModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async findOne(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    const comment = await this.commentModel.findById(id);
+    if (!comment) {
+      throw new NotFoundException('comment not found');
+    }
+    return comment;
   }
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
+  async update(id: string, updateCommentDto: UpdateCommentDto) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    const comment = await this.commentModel.findById(id);
+    if (!comment) {
+      throw new NotFoundException('comment not found');
+    }
+    const updatedComment = await this.commentModel.findByIdAndUpdate(
+      id,
+      updateCommentDto,
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    return {
+      message: 'comment has been updated',
+      data: updatedComment,
+    };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
+  async remove(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
+    const comment = await this.commentModel.findById(id);
+    if (!comment) {
+      throw new NotFoundException('comment not found');
+    }
+    const deletedComment = await this.commentModel.findByIdAndDelete(id);
+    if (!deletedComment) {
+      throw new NotFoundException('comment not found');
+    }
+    await this.blogModel.findByIdAndUpdate(
+      deletedComment?.author,
+      {
+        $pull: { comment: deletedComment._id },
+      },
+      { new: true },
+    );
+    await this.userModel.findByIdAndUpdate(
+      deletedComment?.author,
+      {
+        $pull: { comment: deletedComment._id },
+      },
+      { new: true },
+    );
+    return {
+      message: 'comment has been deleted',
+      data: deletedComment,
+    };
   }
 }
