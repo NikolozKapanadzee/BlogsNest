@@ -92,9 +92,16 @@ export class CommentsService {
     if (!comment) {
       throw new NotFoundException('comment not found');
     }
-    if (comment.author.toString() !== userId.toString()) {
+    const blog = await this.blogModel.findById(comment.blogId);
+    if (!blog) {
+      throw new NotFoundException('Associated blog not found');
+    }
+    const isCommentAuthor = comment.author.toString() === userId.toString();
+    const isBlogAuthor = blog.author.toString() === userId.toString();
+
+    if (!isCommentAuthor && !isBlogAuthor) {
       throw new ForbiddenException(
-        'you do not have permition do update that comment',
+        'You do not have permission to delete this comment',
       );
     }
     const deletedComment = await this.commentModel.findByIdAndDelete(id);
@@ -102,14 +109,14 @@ export class CommentsService {
       throw new NotFoundException('comment not found');
     }
     await this.blogModel.findByIdAndUpdate(
-      deletedComment?.author,
+      deletedComment.blogId,
       {
         $pull: { comments: deletedComment._id },
       },
       { new: true },
     );
     await this.userModel.findByIdAndUpdate(
-      deletedComment?.author,
+      deletedComment.author,
       {
         $pull: { comments: deletedComment._id },
       },

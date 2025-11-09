@@ -96,7 +96,7 @@ export class BlogsService {
       { $pull: { blogs: deletedBlog?._id } },
       { new: true },
     );
-    await this.commentModel.deleteMany({ author: id });
+    await this.commentModel.deleteMany({ blogId: id });
 
     return {
       message: 'Blog has been deleted',
