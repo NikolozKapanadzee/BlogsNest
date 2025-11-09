@@ -1,15 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { BlogId } from 'src/decorators/blog.decorator';
+import { UserId } from 'src/decorators/user.decorator';
+import { ParseMongoIdPipe } from 'src/pipes/parsedmongoid.pipe';
+import { IsAuthGuard } from 'src/guards/IsAuthGuard.guard';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentsService.create(createCommentDto);
+  @Post(':blogId')
+  @UseGuards(IsAuthGuard)
+  create(
+    @Body() createCommentDto: CreateCommentDto,
+    @BlogId(ParseMongoIdPipe) blogId: string,
+    @UserId() userId: string,
+  ) {
+    console.log(userId, 'userId');
+    console.log(blogId, 'blogId');
+    return this.commentsService.create(createCommentDto, blogId, userId);
   }
 
   @Get()

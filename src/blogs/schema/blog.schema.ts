@@ -18,6 +18,13 @@ export class Blog {
     ref: 'user',
   })
   author: mongoose.Schema.Types.ObjectId;
+
+  @Prop({
+    type: [mongoose.Types.ObjectId],
+    ref: 'comment',
+    default: [],
+  })
+  comments: mongoose.Types.ObjectId[];
 }
 
 export const BlogSchema = SchemaFactory.createForClass(Blog);

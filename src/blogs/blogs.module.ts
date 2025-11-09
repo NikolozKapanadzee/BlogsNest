@@ -5,12 +5,14 @@ import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './schema/blog.schema';
 import { User, UserSchema } from 'src/users/schema/user.schema';
+import { Comment, CommentSchema } from 'src/comments/schema/comments.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { schema: BlogSchema, name: Blog.name },
       { schema: UserSchema, name: User.name },
+      { schema: CommentSchema, name: Comment.name },
     ]),
   ],
   controllers: [BlogsController],
