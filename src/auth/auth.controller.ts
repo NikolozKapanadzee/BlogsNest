@@ -4,7 +4,11 @@ import { signUpDTO } from './dto/sign-up.dto';
 import { signInDTO } from './dto/sign-in.dto';
 import { IsAuthGuard } from 'src/guards/IsAuthGuard.guard';
 import { UserId } from 'src/decorators/user.decorator';
-import { ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -73,22 +77,9 @@ export class AuthController {
   signIn(@Body() signInDto: signInDTO) {
     return this.authService.signIn(signInDto);
   }
-  @ApiResponse({
-    status: 201,
-    schema: {
-      example: {
-        _id: '69122a87577850cd8afcf12a',
-        email: 'johndoe@gmail.com',
-        username: 'berbelioti0',
-        blogs: [],
-        comments: [],
-        createdAt: '2025-11-10T18:10:15.540Z',
-        updatedAt: '2025-11-10T18:10:15.540Z',
-        __v: 0,
-      },
-    },
-  })
+
   @Get('current-user')
+  @ApiBearerAuth()
   @UseGuards(IsAuthGuard)
   getCurrentUser(@UserId() userId) {
     return this.authService.getCurrentUser(userId);

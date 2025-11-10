@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('Simple Blogs Api')
     .setDescription('This is my very first blogs api')
     .setVersion('1.0')
+    .addBearerAuth()
     .addTag('blogs')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
