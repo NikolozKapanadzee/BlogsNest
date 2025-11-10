@@ -19,6 +19,7 @@ import { IsAuthGuard } from 'src/guards/IsAuthGuard.guard';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiOkResponse,
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
@@ -32,6 +33,12 @@ export class CommentsController {
     schema: {
       example: 'comment Created Successfully',
     },
+  })
+  @ApiParam({
+    name: 'id',
+    type: String,
+    description: 'The mongo Id if the blog',
+    example: '6910e4417d38440e8480c45a',
   })
   @Post(':blogId')
   @UseGuards(IsAuthGuard)
@@ -56,6 +63,19 @@ export class CommentsController {
     type: String,
     description: 'The mongo Id if the comment',
     example: '6912367c0301f99a395f8f05',
+  })
+  @ApiOkResponse({
+    description: 'Comment found successfully',
+    schema: {
+      example: {
+        _id: '6912367c0301f99a395f8f05',
+        content: 'My Very First Comment',
+        blogId: '6910e4417d38440e8480c45a',
+        author: '69122a87577850cd8afcf12a',
+        createdAt: '2025-11-10T18:22:30.123Z',
+        updatedAt: '2025-11-10T18:22:30.123Z',
+      },
+    },
   })
   @ApiBadRequestResponse({
     description: 'Bad Request',
