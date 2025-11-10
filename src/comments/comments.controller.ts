@@ -35,7 +35,7 @@ export class CommentsController {
     },
   })
   @ApiParam({
-    name: 'id',
+    name: 'blogId',
     type: String,
     description: 'The mongo Id if the blog',
     example: '6910e4417d38440e8480c45a',
